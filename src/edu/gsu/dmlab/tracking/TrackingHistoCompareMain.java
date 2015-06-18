@@ -23,17 +23,17 @@ public class TrackingHistoCompareMain {
 		// HomeTrackingDBConnection tdb = (HomeTrackingDBConnection) factory
 		// .getTrackingDBConnection();
 		// tdb.populateParamCombos();
-//		{
-//			HistogramComparison hc = factory.getHistoComp(type1);
-//			ITrack[] tracks = factory.getTrackedResults(type1, fileLocation,
-//					span);
-//			hc.run(tracks, 3330807);
-//		}
+		{
+			HistogramComparison hc = factory.getHistoComp(type1);
+			ITrack[] tracks = factory.getTrackedResults(type1, fileLocation,
+					span);
+			hc.run(tracks);
+		}
 		{
 			HistogramComparison hc = factory.getHistoComp(type2);
 			ITrack[] tracks = factory.getTrackedResults(type2, fileLocation,
 					span);
-			hc.run(tracks, 4608346);
+			hc.run(tracks);
 		}
 
 	}

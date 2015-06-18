@@ -16,7 +16,7 @@ import java.sql.SQLException;
 
 public interface ITrackingDBConnection {
 
-	public int[][] getParamCombos(int offset, int limit) throws SQLException;
+	public int[][] getParamCombos(String type, int limit) throws SQLException;
 
 	public int[] getWavelengths() throws SQLException;
 

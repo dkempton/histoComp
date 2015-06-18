@@ -304,18 +304,21 @@ public class HomeTrackingDBConnection implements ITrackingDBConnection {
 		System.out.println("All is done.");
 	}
 
-	public int[][] getParamCombos(int offset, int limit) throws SQLException {
+	public int[][] getParamCombos(String type, int limit) throws SQLException {
 		Connection con = null;
 		int[][] returnVals = null;
 		try {
 			con = this.dsourc.getConnection();
 			con.setAutoCommit(true);
 
-			String selString = "SELECT * FROM param_combos limit ?,?;";
+			String selString = "SELECT * FROM param_combos LEFT JOIN "
+					+ type.toLowerCase()
+					+ "_hist_vals ON "
+					+ type.toLowerCase()
+					+ "_hist_vals.param_combo_id = param_combos.id WHERE isnull(param_combo_id) LIMIT ?;";
 
 			PreparedStatement selParamsStmt = con.prepareStatement(selString);
-			selParamsStmt.setInt(1, offset);
-			selParamsStmt.setInt(2, limit);
+			selParamsStmt.setInt(1, limit);
 
 			ResultSet rs = selParamsStmt.executeQuery();
 			ArrayList<int[]> paramAndIdList = new ArrayList<int[]>();
@@ -334,12 +337,16 @@ public class HomeTrackingDBConnection implements ITrackingDBConnection {
 				for (int j = 0; j < actualVals.length; j++) {
 					actualVals[j] = tmpVals[j];
 				}
+				tmpVals = null;
 				paramAndIdList.add(actualVals);
 			}
+			selParamsStmt.close();
+			selParamsStmt = null;
 
 			returnVals = new int[paramAndIdList.size()][];
 			paramAndIdList.toArray(returnVals);
-
+			paramAndIdList.clear();
+			paramAndIdList = null;
 		} finally {
 			if (con != null) {
 				con.close();
@@ -396,7 +403,10 @@ public class HomeTrackingDBConnection implements ITrackingDBConnection {
 			saveValsStmt1.setDouble(3, fVal2);
 
 			saveValsStmt1.executeUpdate();
-			
+
+			saveValsStmt1.close();
+			saveValsStmt1 = null;
+
 		} finally {
 			if (con != null) {
 				con.close();

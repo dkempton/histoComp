@@ -53,18 +53,18 @@ public class HistogramComparison implements FutureCallback<Boolean> {
 		this.condDoneProcessing = this.lock.newCondition();
 	}
 
-	public void run(ITrack[] tracks, int offset) {
+	public void run(ITrack[] tracks) {
 
-		int[][] paramCombos = this.factory
-				.getParamCombos(offset, this.pageSize);
+		int[][] paramCombos = this.factory.getParamCombos(this.type,
+				this.pageSize);
 		while ((paramCombos != null) && (paramCombos.length != 0)) {
 			for (int i = 0; i < paramCombos.length; i++) {
 				System.out.println("Processing type {" + this.type
 						+ "} param combo Id: " + paramCombos[i][0]);
 				this.createProcessingTask(tracks, paramCombos[i]);
 			}
-			offset += this.pageSize;
-			paramCombos = this.factory.getParamCombos(offset, this.pageSize);
+			paramCombos = null;
+			paramCombos = this.factory.getParamCombos(this.type, this.pageSize);
 		}
 
 		this.lock.lock();

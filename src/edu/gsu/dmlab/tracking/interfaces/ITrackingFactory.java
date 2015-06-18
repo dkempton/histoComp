@@ -16,5 +16,5 @@ public interface ITrackingFactory {
 
 	public ITrackingDBConnection getTrackingDBConnection();
 
-	public int[][] getParamCombos(int offset, int limit);
+	public int[][] getParamCombos(String type, int limit);
 }

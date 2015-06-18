@@ -32,6 +32,7 @@ import edu.gsu.dmlab.ObjectFactory;
 import edu.gsu.dmlab.databases.interfaces.IImageDBConnection;
 import edu.gsu.dmlab.datatypes.interfaces.ITrack;
 import edu.gsu.dmlab.exceptions.InvalidConfigException;
+import edu.gsu.dmlab.imageproc.interfaces.IHistogramProducer;
 import edu.gsu.dmlab.tracking.databases.CallableCalcAndSaveHistDistances;
 import edu.gsu.dmlab.tracking.databases.HomeTrackingDBConnection;
 import edu.gsu.dmlab.tracking.databases.interfaces.ITrackingDBConnection;
@@ -43,6 +44,7 @@ public class TrackingFactory implements ITrackingFactory {
 	DBPoolDataSource trackingDBPoolSourc = null;
 	IImageDBConnection imageDB = null;
 	ITrackingDBConnection trackingDB = null;
+	IHistogramProducer histoProducer = null;
 	ListeningExecutorService executor = null;
 
 	int imageCacheSize;
@@ -57,10 +59,21 @@ public class TrackingFactory implements ITrackingFactory {
 		this.imageDB = ObjectFactory.getImageDBConnection(
 				this.imageDBPoolSourc, this.imageCacheSize);
 		this.trackingDB = new HomeTrackingDBConnection(this.trackingDBPoolSourc);
-
 		this.wavelengths = this.trackingDB.getWavelengths();
+		this.histoProducer = ObjectFactory.getHistoProducer(this.imageDB,
+				this.wavelengths);
 		this.executor = MoreExecutors.listeningDecorator(Executors
 				.newFixedThreadPool(this.maxThreads));
+	}
+
+	@Override
+	public void finalize() {
+		try {
+			super.finalize();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		this.executor.shutdown();
 	}
 
 	/*
@@ -74,14 +87,14 @@ public class TrackingFactory implements ITrackingFactory {
 	@Override
 	public Callable<Boolean> getCallableCalcAndSaveHistDistances(String type,
 			ITrack[] tracks, int[] paramCombos) {
-		return new CallableCalcAndSaveHistDistances(this.imageDB,
-				this.trackingDB, type, tracks, paramCombos, this.wavelengths);
+		return new CallableCalcAndSaveHistDistances(this.trackingDB,
+				this.histoProducer, type, tracks, paramCombos, this.wavelengths);
 	}
 
 	@Override
-	public int[][] getParamCombos(int offset, int limit) {
+	public int[][] getParamCombos(String type, int limit) {
 		try {
-			return this.trackingDB.getParamCombos(offset, limit);
+			return this.trackingDB.getParamCombos(type, limit);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
