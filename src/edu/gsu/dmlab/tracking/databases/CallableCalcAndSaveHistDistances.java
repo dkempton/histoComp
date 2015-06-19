@@ -25,13 +25,13 @@ import edu.gsu.dmlab.tracking.databases.interfaces.ITrackingDBConnection;
  */
 public class CallableCalcAndSaveHistDistances implements Callable<Boolean> {
 
-	static final float ranges[][] = { { (float) 0.75, (float) 8.3 },
-			{ (float) 0, (float) 256 }, { (float) 0, (float) 52 },
-			{ (float) 0.75, (float) 2 }, { (float) 0, (float) 14 },
-			{ (float) 0, (float) 150 }, { (float) -0.05, (float) 0.175 },
-			{ (float) -0.0001, (float) 0.005 }, { (float) 0, (float) 10 },
-			{ (float) -0.0001, (float) 0.05 } };
-	static final int histSize = 15;
+//	static final float ranges[][] = { { (float) 0.75, (float) 8.3 },
+//			{ (float) 0, (float) 256 }, { (float) 0, (float) 52 },
+//			{ (float) 0.75, (float) 2 }, { (float) 0, (float) 14 },
+//			{ (float) 0, (float) 150 }, { (float) -0.05, (float) 0.175 },
+//			{ (float) -0.0001, (float) 0.005 }, { (float) 0, (float) 10 },
+//			{ (float) -0.0001, (float) 0.05 } };
+//	static final int histSize = 15;
 
 	// IImageDBConnection imageDB;
 	ITrackingDBConnection trackingDB;
@@ -170,7 +170,7 @@ public class CallableCalcAndSaveHistDistances implements Callable<Boolean> {
 					Mat sameHist4 = new Mat();
 					this.histoProducer.getHist(sameHist4, sameEvents[3], dims,
 							false);
-					sameEvents = null;
+					//sameEvents = null;
 
 					// Different events will have 2 events in it this is
 					// guaranteed by the constructor previous checks
@@ -180,7 +180,7 @@ public class CallableCalcAndSaveHistDistances implements Callable<Boolean> {
 					Mat diffHist2 = new Mat();
 					this.histoProducer.getHist(diffHist2, diffEvents[1], dims,
 							false);
-					diffEvents = null;
+					//diffEvents = null;
 
 					double sameVal1, sameVal2, difVal1, difVal2;
 					int compareMethod = this.paramCombos[1];
@@ -193,9 +193,9 @@ public class CallableCalcAndSaveHistDistances implements Callable<Boolean> {
 					Core.subtract(sameHist1, sameHist2, sameSubHist1);
 					// release and cleanup
 					sameHist1.release();
-					sameHist1 = null;
+					//sameHist1 = null;
 					sameHist2.release();
-					sameHist2 = null;
+					//sameHist2 = null;
 
 					Mat sameSubHist2 = new Mat();
 					Core.subtract(sameHist3, sameHist4, sameSubHist2);
@@ -272,18 +272,7 @@ public class CallableCalcAndSaveHistDistances implements Callable<Boolean> {
 		cat2List.add(diffCat2);
 
 		double fVal1 = ow.anovaFValue(cat1List);
-		cat1List.clear();
-		cat1List = null;
-		sameCat1 = null;
-		diffCat1 = null;
-
 		double fVal2 = ow.anovaFValue(cat2List);
-		cat2List.clear();
-		cat2List = null;
-		sameCat2 = null;
-		diffCat2 = null;
-
-		ow = null;
 
 		if (Double.isNaN(fVal1)) {
 			fVal1 = 0;

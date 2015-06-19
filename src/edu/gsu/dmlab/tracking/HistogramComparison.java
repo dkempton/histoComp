@@ -2,6 +2,7 @@ package edu.gsu.dmlab.tracking;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -106,12 +107,19 @@ public class HistogramComparison implements FutureCallback<Boolean> {
 	private void handleClassificationTaskFinished() {
 		this.lock.lock();
 		try {
-			Iterator<FutureTask<Boolean>> itr = this.calcAndSaveList.iterator();
+			
 
-			while (itr.hasNext()) {
-				FutureTask<Boolean> tsk = itr.next();
+			for (int i = 0; i<this.calcAndSaveList.size();i++) {
+				FutureTask<Boolean> tsk = this.calcAndSaveList.get(i);
 				if (tsk.isDone()) {
-					itr.remove();
+					this.calcAndSaveList.remove(i);
+					try {
+						tsk.get();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+					}
 					this.condNotFull.signal();
 				}
 			}
